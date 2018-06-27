@@ -1181,7 +1181,7 @@ void _list_dupbykey(list * ll_which, listNode ** loc, void *key, list * target, 
 list *list_dupByKey(list * ll_which, void *value, int (*cmp) (const void *, const void *))
 {
 	int len;
-	list *duplist;
+	list *duplist=NULL;
 	listNode **loc;
 
     if ( ll_which == NULL ) return(NULL);
@@ -1191,8 +1191,8 @@ list *list_dupByKey(list * ll_which, void *value, int (*cmp) (const void *, cons
 	while(len > 0) {
 
 	if ( (loc = ListMap2VectorAddr(ll_which))==NULL ) break;
+	if ( ( duplist = ListCreate() ) == NULL ) break;
 
-	duplist = ListCreate();
 	duplist->head = duplist->tail = NULL;
 	duplist->len = 0;
 	duplist->dup = ll_which->dup;
@@ -1494,72 +1494,3 @@ void ListQsort_x(list * ll_which, int (*cmp) (const void *, const void *,int),in
    }
 	return;
 }
-#define _MINLEN 16
-int append_vnode(vNode *dest,unsigned char *id) {
-    int retval = FALSE;    
-    void *vptr;    
-    do {
-       if ( (dest == NULL) || (id==NULL) ) break;
-       if ( dest->stackPos >= dest->stackSize ) {
-         if ( ( dest->stackPtr = realloc(dest->stackPtr, 
-                sizeof(unsigned char *)*(dest->stackSize+_MINLEN) ) ) == NULL ) break;
-       }
-       dest->stackSize += _MINLEN;
-       dest->stackPtr[dest->stackPos++] = id;
-     
-       retval = TRUE; 
-    } while(0); 
-    return(retval);    
-}
-
-vNode *create_vnode(int xlen) {
-    vNode *retval=NULL;
-    do {
-     if ( xlen < 1 ) break;
-     if ( (retval = calloc(1,sizeof(vNode)) ) == NULL ) break;
-     retval->stackSize = xlen;
-     retval->stackPos = 0;
-     retval->stackPtr = calloc(xlen,sizeof(unsigned char *));
-    } while(0);
-    return(retval);
-}
-
-int topmost(vNode *out, void *src, compfunc func) {
-    int retval = FALSE;
-    int i,j;
-
-    do {
-       if ( (out==NULL) || (src==NULL) ) break;
-      
-       if ( out->stackPos==0 ) { out->stackPtr[out->stackPos++] = src; break; }
-       if ( out->stackPos == out->stackSize ) 
-         if ( func( (unsigned char *)src,out->stackPtr[out->stackPos-1]) == TRUE ) break;
-      
-       for( i=0; i<out->stackPos; i++) 
-            if ( func( (unsigned char *)src,out->stackPtr[i]) != TRUE ) break;
-        
-       for( j=out->stackPos-1; j>i; j--) 
-            out->stackPtr[j] = out->stackPtr[j-1];
-            out->stackPtr[i] = src;
-
-       if ( out->stackPos < out->stackSize-1 ) 
-            out->stackPos++;
-       
-    } while(0);
-    return(retval);
-}
-
-vNode *extremum(list *l, int n, compfunc func) {
-    vNode *vbuff;
-    listIter *iter;
-    listNode *node;
-    do { 
-        if( ( l==NULL ) || ( n < 1 ) || ( func==NULL ) ) break;
-        if ( (vbuff=create_vnode(n) ) == NULL ) break;
-	    ListEachFromHead(l,iter,node) {
-	        topmost(vbuff, (void *)listNodeValue(node), func) ;
-	    } ListEachEnd(iter);
-    } while(0);
-    return(vbuff);
-}
-

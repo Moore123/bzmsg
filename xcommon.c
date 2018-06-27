@@ -17,6 +17,36 @@ int randi(int max)
     return (int)(max * cof);
 }
 
+/* Subtracts time values to determine run time */
+int timeval_subtract (struct timeval *result, struct timeval *t2, struct timeval *t1)
+{
+  long int diff = (t2->tv_usec + 1000000 * t2->tv_sec) - (t1->tv_usec + 1000000 * t1->tv_sec);
+  result->tv_sec = diff / 1000000;
+  result->tv_usec = diff % 1000000;
+
+  return (diff < 0);
+}
+
+/* Starts timer */
+void tic (struct timeval *timer) { 
+    memset(timer,0x0,sizeof(struct timeval));
+	gettimeofday(timer, NULL); 
+}
+
+
+/* Stops timer and prints difference to the screen */
+void toc (struct timeval *timer) {
+  struct timeval tv_end, tv_diff;
+
+  memset(&tv_end,0x0,sizeof(struct timeval));
+  memset(&tv_diff,0x0,sizeof(struct timeval));
+  gettimeofday(&tv_end, NULL);
+  timeval_subtract (&tv_diff, &tv_end, timer);
+  if ( _quiet == 1 ) 
+  printf("Running time is %ld.%06lds\n", tv_diff.tv_sec, tv_diff.tv_usec);
+
+}
+
 bzMSG *bson_pump(int sock, bson * b)
 {
 	char *buff = NULL, *zbuff = NULL;

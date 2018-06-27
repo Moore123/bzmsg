@@ -36,12 +36,14 @@
 
 #include "compmark.h"
 #include "bson.h"
+#include "list.h"
 #include "pthreadpool.h"
 #include "MurmurHash3.h"
 
 #include "nnutils.h"
 
 extern int _debug;
+extern int _quiet;
 
 #define TRUE 1
 #define FALSE 0
@@ -62,13 +64,17 @@ typedef struct _String_Pair_Method{
     char *str;
     uint32_t nn_method;
     bool set_sock_opt;
+    bool interactive;
 } String_Pair_Method;
 
 extern int randi(int max);
+void tic (struct timeval *timer); 
+void toc (struct timeval *timer); 
+
 extern bzMSG *bson_pump(int sock, bson * b);
 extern bson *recv_a_bson(int sock);
 extern void do_server(char *url, char *method);
-extern void do_client(char *url, char *method,int repeat, int blen);
+extern void do_client(char *url, char *method,char *kpre, int repeat, int ncount,  int blen);
 
 #define min(x,y)        ((x) < (y) ? (x) : (y))
 #define max(x,y)        ((x) > (y) ? (x) : (y))
