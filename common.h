@@ -73,6 +73,8 @@ void toc (struct timeval *timer);
 
 extern bzMSG *bson_pump(int sock, bson * b);
 extern bson *recv_a_bson(int sock);
+extern void dump_bson_display(bson *data,int depth, char *exkey);
+
 extern void do_server(char *url, char *method);
 extern void do_client(char *url, char *method,char *kpre, int repeat, int ncount,  int blen);
 

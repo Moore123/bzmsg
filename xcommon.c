@@ -47,6 +47,89 @@ void toc (struct timeval *timer) {
 
 }
 
+void dump_bson_display(bson *data,int depth, char *exkey)
+{
+
+	bson_iterator it;
+	bson_type t;
+	char *key;
+	char *strBuf;
+	char hex_oid[25];
+    int  i, temp;
+    double *dbuf;
+
+	bson_iterator_init(&it, data);
+
+	while (bson_iterator_next(&it)) {
+
+		t = bson_iterator_type(&it);
+
+		key = (char *)bson_iterator_key(&it);
+        if ( ( exkey != NULL ) &&
+            (strcmp(key, exkey, max( strlen(key), strlen(exkey) ) ) == 0) )  break;
+
+		printf("(key) \"%s\"",key);
+        for(temp=0;temp<depth;temp++) printf("\t");
+
+		switch (t) {
+		case BSON_DOUBLE:
+			printf("(double) %6.2f\n", bson_iterator_double(&it));
+			break;
+		case BSON_INT:
+			printf("(int) %d\n", bson_iterator_int(&it));
+			break;
+		case BSON_STRING:
+			strBuf = strdup((char *)bson_iterator_string(&it));
+			printf("(string) \"%s\"\n", strBuf);
+            free(strBuf);
+			break;
+		case BSON_OID:
+			bson_oid_to_string(bson_iterator_oid(&it), hex_oid);
+			printf("(oid) \"%s\"\n", hex_oid);
+			break;
+		case BSON_OBJECT:
+			printf("(subobject) {...}\n");
+            bson_print_raw( bson_iterator_value( &it ) , depth+1 );
+			break;
+		case BSON_ARRAY:
+			printf("(array) [...]\n");
+            bson_print_raw( bson_iterator_value( &it ) , depth+1 );
+			break;
+		case BSON_TIMESTAMP:
+			printf("(timestamp) [...]\n");
+			break;
+        case BSON_BINDATA:
+            bson_printf( "(BINDATA) [...] len %d\n" ,temp = bson_iterator_bin_len(&it) );
+            dbuf = (double *)bson_iterator_bin_data(&it); 
+            for ( i=0; i<temp/sizeof(double); i++ ) {
+                printf("%12.2lf",dbuf[i]);
+                if ( (i+1)%8  == 0 ) printf("\n");
+                if ( (i+1)%16  == 0 ) printf("\n");
+                }
+            break;
+		default:
+        /*
+		    BSON_EOO = 0,
+			BSON_BINDATA = 5,
+			BSON_UNDEFINED = 6,
+			BSON_BOOL = 8,
+			BSON_DATE = 9,
+			BSON_NULL = 10,
+			BSON_REGEX = 11,
+			BSON_DBREF = 12, 
+			BSON_CODE = 13,
+			BSON_SYMBOL = 14,
+			BSON_CODEWSCOPE = 15,
+	*/
+			printf("Note (type %d)\n", bson_iterator_type(&it));
+			break;
+		}
+
+	}
+
+	return;
+}
+
 bzMSG *bson_pump(int sock, bson * b)
 {
 	char *buff = NULL, *zbuff = NULL;
