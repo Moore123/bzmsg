@@ -3,7 +3,8 @@
 extern String_Pair_Method spm[];
 extern int spm_len;
 
-bool self_rep_server(int sc, bson *b) {
+bool self_rep_server(int sc, char *fmt,...) {
+    bson *b;
     if ( ( b = recv_a_bson(sc) ) == NULL ) return(FALSE);
     dump_bson_display(b,1,NULL);
     return(TRUE);
@@ -33,7 +34,7 @@ void do_server(char *url, char *method) {
    sc = test_socket(AF_SP, sptr->nn_method);
    test_bind(sc, url);
    while(loop) {
-        if ( sptr->udf ) loop = sptr->udf(sc, b);
+        if ( sptr->udf ) loop = sptr->udf(sc,sptr->fmt_str);
    }
 
   } while(0);

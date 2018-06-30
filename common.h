@@ -62,12 +62,13 @@ typedef struct __attribute__ ((aligned(8))) _bzMSG {
 	char *headsize;
 } bzMSG;
 
-typedef bool (*user_def_action)(int sock,bson *b);
+typedef bool (*user_def_action)(int sock,char *fmt,...);
 typedef struct _String_Pair_Method{
     char *str;
     uint32_t nn_method;
     bool set_sock_opt;
     user_def_action udf;
+    char *fmt_str;
 } String_Pair_Method;
 
 extern int randi(int max);

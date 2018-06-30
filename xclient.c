@@ -19,13 +19,13 @@ list *gen_bson_list(char *kfix,int nc, int rmax) {
  list *retval=NULL;
  bson *b;
  char *kstr, *buff;
- int i, j, k, cnt=0, lmt;
+ int i=0, j, k, cnt=0, lmt;
 
+ kstr = Calloc(MIN_STR,char);
+ buff = Calloc(rmax+1,char);
  do {
     if ( ( retval = ListCreate() ) == NULL ) break;
     retval->free = bson_free;
-    kstr = Calloc(MIN_STR,char);
-    buff = Calloc(rmax+1,char);
     cnt = 0;
     if ( ( b = CallocBson() ) == NULL ) break;
     while( cnt++ < nc) {
@@ -35,13 +35,17 @@ list *gen_bson_list(char *kfix,int nc, int rmax) {
     }
 	bson_finish(b);
     ListAddNodeTail(retval,b);
+
     if ( i++ >= rmax ) break;
  } while(0);
+
+ if ( kstr ) free(kstr);
+ if ( buff ) free(buff);
 
  return(retval);
 }
 
-bool self_req_client( int sc, bson *bnull ){
+bool self_req_client( int sc, char *fmt,...){
     list *dl;
     listIter *iter;
     listNode *node;
@@ -49,15 +53,19 @@ bool self_req_client( int sc, bson *bnull ){
 
     bool retval = TRUE;
     do {
-        if ( ( dl = gen_bson_list("xKey", 100, 15))==NULL ) {
+        if ( ( dl = gen_bson_list("xKey", 10, 15))==NULL ) {
             retval = FALSE;
             break;
         }
 	    ListEachFromHead(dl, iter, node) {
 	        b = (bson *)listNodeValue(node);
+            dump_bson_display(b,1,NULL);
             bson_pump(sc, b);        
         } ListEachEnd(iter);
+
+       ListRelease(dl);
     } while(0);
+    
     return(retval);
 }
 
@@ -84,12 +92,10 @@ void do_client(char *url, char *method,char *k, int repeat, int ncount, int rmax
     sc = test_socket(AF_SP, sptr->nn_method);
     test_connect (sc, url);
     while( j++ < repeat && ( loop == TRUE ) ) {
-	        if ( sptr->udf ) loop = sptr->udf(sc, b);
-            if ( loop == FALSE ) break;
+	        if ( sptr->udf ) loop = sptr->udf(sc,sptr->fmt_str);
        }
 
   } while(0);
-
 
   return;
 

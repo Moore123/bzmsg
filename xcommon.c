@@ -79,9 +79,10 @@ void dump_bson_display(bson *data,int depth, char *exkey)
 			printf("(int) %d\n", bson_iterator_int(&it));
 			break;
 		case BSON_STRING:
-			strBuf = strdup((char *)bson_iterator_string(&it));
+			if( ( strBuf = strdup((char *)bson_iterator_string(&it)) ) != NULL ) {
 			printf("(string) \"%s\"\n", strBuf);
             free(strBuf);
+            }
 			break;
 		case BSON_OID:
 			bson_oid_to_string(bson_iterator_oid(&it), hex_oid);

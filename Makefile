@@ -1,4 +1,4 @@
-DEBUG=
+DEBUG=0
 
 SRCS = bson.c encoding.c numbers.c list.c tpool.c MurmurHash3.c xcommon.c err.c xserver.c xclient.c tmain.c
 
