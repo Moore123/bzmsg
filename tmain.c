@@ -31,7 +31,7 @@ int spm_len = asizeof(spm);
 
 void usage(char *name) {
      printf("%s -n [ncount/10] -u [URL] -m [method]  -b [bson length/100] \n",name); 
-     printf("-r [repeat] -k [keyprefix] \n");
+     printf("-r [repeat] -k [keyprefix] -D\n");
      exit(1); 
 }
 

@@ -101,7 +101,7 @@ void dump_bson_display(bson *data,int depth, char *exkey)
         case BSON_BINDATA:
             bson_printf( "(BINDATA) [...] len %d\n" ,temp = bson_iterator_bin_len(&it) );
             dbuf = (double *)bson_iterator_bin_data(&it); 
-            for ( i=0; i<temp/sizeof(double); i++ ) {
+            for ( i=0; i<(int)(temp/sizeof(double)); i++ ) {
                 printf("%12.2lf",dbuf[i]);
                 if ( (i+1)%8  == 0 ) printf("\n");
                 if ( (i+1)%16  == 0 ) printf("\n");
@@ -167,7 +167,7 @@ bzMSG *bson_pump(int sock, bson * b)
 
 		memcpy(buff + offsetof(bzMSG, headsize), zbuff, copylen);
 		m->crc = Murmurhash64A(buff + offsetof(bzMSG, headsize), m->msgsize, CONFUSECODE);
-        printf("msg->len %lu m->CRC is %lx\n",m->msgsize,m->crc); 
+        if(_debug) printf("msg->len %lu m->CRC is %lx\n",m->msgsize,m->crc); 
 		memcpy(buff, m, offsetof(bzMSG, headsize));
 
 		if ((rc = nn_send(sock, buff, sendlen, 0)) != sendlen) {
@@ -188,12 +188,12 @@ bson *recv_a_bson(int sock) {
         bson *b=NULL;
 
     do {
-        fprintf(stderr,"%s O",__func__);
+     if ( _debug ) fprintf(stderr,"%s O",__func__);
 		int bytes = nn_recv(sock, &buf, NN_MSG, 0);
 
 		b = Calloc(1, bson);
 		bson_init_empty(b);
-        fprintf(stderr,"O");
+     if( _debug ) fprintf(stderr,"O");
 
 		msg = Calloc(1, bzMSG);
 		memcpy(msg, buf, offsetof(bzMSG, headsize));

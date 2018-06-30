@@ -4,7 +4,8 @@ extern String_Pair_Method spm[];
 extern int spm_len;
 
 bool self_rep_server(int sc, bson *b) {
-    b = recv_a_bson(sc);
+    if ( ( b = recv_a_bson(sc) ) == NULL ) return(FALSE);
+    dump_bson_display(b,1,NULL);
     return(TRUE);
 }
 
