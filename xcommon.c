@@ -66,7 +66,7 @@ void dump_bson_display(bson *data,int depth, char *exkey)
 
 		key = (char *)bson_iterator_key(&it);
         if ( ( exkey != NULL ) &&
-            (strcmp(key, exkey, max( strlen(key), strlen(exkey) ) ) == 0) )  break;
+            (strncmp(key, exkey, max( strlen(key), strlen(exkey)) ) == 0) )  break;
 
 		printf("(key) \"%s\"",key);
         for(temp=0;temp<depth;temp++) printf("\t");

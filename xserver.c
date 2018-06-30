@@ -3,12 +3,17 @@
 extern String_Pair_Method spm[];
 extern int spm_len;
 
+bool self_rep_server(int sc, bson *b) {
+    b = recv_a_bson(sc);
+    return(TRUE);
+}
+
 void do_server(char *url, char *method) {
 
   int i, sc, rc;
-  bool match = FALSE;
+  bool match = FALSE, loop = TRUE;
   String_Pair_Method *sptr;
-  bson *b;
+  bson *b=NULL;
   printf("%s %s %s\n",__func__,url,method);
 
   do {
@@ -26,9 +31,10 @@ void do_server(char *url, char *method) {
 
    sc = test_socket(AF_SP, sptr->nn_method);
    test_bind(sc, url);
-   b = recv_a_bson(sc);
+   while(loop) {
+        if ( sptr->udf ) loop = sptr->udf(sc, b);
+   }
 
-    printf("\n");
   } while(0);
 
   return;

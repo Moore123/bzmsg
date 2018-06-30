@@ -14,15 +14,17 @@ int _debug;
 int _quiet;
 struct pthreadpool_t *tpool;
 
+
+//change user defined function of Pair_Method for one's testing 
 String_Pair_Method spm[]= {
-    { "rep", NN_REP, FALSE, TRUE },
-    { "req", NN_REQ, FALSE, TRUE },
-    { "pub", NN_PUB, FALSE, FALSE },
-    { "sub", NN_SUB, TRUE, FALSE },
-    { "bus", NN_BUS, FALSE, FALSE },
-    { "push", NN_PUSH, FALSE, FALSE },
-    { "pull", NN_PULL, FALSE, FALSE },
-    { "pair", NN_PAIR, FALSE, FALSE },
+    { "rep", NN_REP, FALSE, self_rep_server },
+    { "req", NN_REQ, FALSE, self_req_client },
+    { "pub", NN_PUB, FALSE, NULL },
+    { "sub", NN_SUB, TRUE, NULL },
+    { "bus", NN_BUS, FALSE, NULL },
+    { "push", NN_PUSH, FALSE, NULL },
+    { "pull", NN_PULL, FALSE, NULL },
+    { "pair", NN_PAIR, FALSE, NULL },
 };
 
 int spm_len = asizeof(spm);

@@ -13,6 +13,11 @@ bson *CallocBson()
 	return (r);
 }
 
+bool self_req_client( int sc, bson *b ){
+    bson_pump(sc, b);        
+    return(TRUE);
+}
+
 list *gen_bson_list(char *kfix,int nc, int rmax) {
 
  list *retval=NULL;
@@ -44,7 +49,7 @@ void do_client(char *url, char *method,char *k, int repeat, int ncount, int rmax
 
   int i , j=0 , sc ;
   String_Pair_Method *sptr;
-  bool match = FALSE;
+  bool match = FALSE, loop=TRUE;
   list *dl;
   listIter *iter;
   listNode *node;
@@ -66,12 +71,11 @@ void do_client(char *url, char *method,char *k, int repeat, int ncount, int rmax
     dl = gen_bson_list(k, ncount, rmax);
     sc = test_socket(AF_SP, sptr->nn_method);
     test_connect (sc, url);
-    while( j++ < repeat ) {
-
+    while( j++ < repeat && ( loop == TRUE ) ) {
 	    ListEachFromHead(dl, iter, node) {
 	        b = (bson *)listNodeValue(node);
-	        bson_pump(sc, b);        
-	        if ( sptr->interactive == TRUE ) rb = recv_a_bson(sc);
+	        if ( sptr->udf ) loop = sptr->udf(sc, b);
+            if ( loop == FALSE ) break;
 	    } ListEachEnd(iter);
 
     }

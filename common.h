@@ -42,6 +42,8 @@
 
 #include "nnutils.h"
 
+#include "udf.h"
+
 extern int _debug;
 extern int _quiet;
 
@@ -60,11 +62,12 @@ typedef struct __attribute__ ((aligned(8))) _bzMSG {
 	char *headsize;
 } bzMSG;
 
+typedef bool (*user_def_action)(int sock,bson *b);
 typedef struct _String_Pair_Method{
     char *str;
     uint32_t nn_method;
     bool set_sock_opt;
-    bool interactive;
+    user_def_action udf;
 } String_Pair_Method;
 
 extern int randi(int max);
