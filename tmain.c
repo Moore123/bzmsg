@@ -18,7 +18,7 @@ struct pthreadpool_t *tpool;
 //change user defined function of Pair_Method for one's testing 
 String_Pair_Method spm[]= {
     { "rep", NN_REP, FALSE, self_rep_server , NULL },
-    { "req", NN_REQ, FALSE, self_req_client , NULL },
+    { "req", NN_REQ, FALSE, self_req_client , "%k"},
     { "pub", NN_PUB, FALSE, NULL , NULL },
     { "sub", NN_SUB, TRUE, NULL , NULL },
     { "bus", NN_BUS, FALSE, NULL , NULL },

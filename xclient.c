@@ -50,10 +50,26 @@ bool self_req_client( int sc, char *fmt,...){
     listIter *iter;
     listNode *node;
     bson *b;
+    char *xk=NULL;
 
     bool retval = TRUE;
+    va_list ap;
+
+    va_start(ap,fmt);
+      while (*fmt) {
+         switch (*fmt++) {
+            case 'k':              /* string */
+               xk = va_arg(ap, char *);
+               break;
+            default:
+               break;
+            }
+      }
+    va_end(ap);
+
     do {
-        if ( ( dl = gen_bson_list("xKey", 10, 15))==NULL ) {
+        if ( xk==NULL ) xk=strdup("xKey");
+        if ( ( dl = gen_bson_list(xk, 10, 15))==NULL ) {
             retval = FALSE;
             break;
         }
@@ -92,7 +108,7 @@ void do_client(char *url, char *method,char *k, int repeat, int ncount, int rmax
     sc = test_socket(AF_SP, sptr->nn_method);
     test_connect (sc, url);
     while( j++ < repeat && ( loop == TRUE ) ) {
-	        if ( sptr->udf ) loop = sptr->udf(sc,sptr->fmt_str);
+	        if ( sptr->udf ) loop = sptr->udf(sc,sptr->fmt_str,k);
        }
 
   } while(0);
